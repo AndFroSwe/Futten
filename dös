@@ -1,0 +1,682 @@
+[33mcommit 53e4fcb3488bbc7d7c505c2e0e3060d80d9692c0[m
+Author: AndFroSwe <gummianka88@gmail.com>
+Date:   Sun Oct 4 10:36:46 2015 +0200
+
+    General RKeval implemented
+
+[1mdiff --git a/F.m b/F.m[m
+[1mindex 993fd4d..a00fd88 100644[m
+[1m--- a/F.m[m
+[1m+++ b/F.m[m
+[36m@@ -14,4 +14,4 @@[m [mx2 = u(1)*u(4)^2+G*cosd(alpha)-g*(R/u(1))^2;[m
+ x3 = u(4);[m
+ x4 = (G*sind(alpha)-2*u(2)*u(4))/u(1);[m
+ [m
+[31m-u_ut = [x1 x2 x3 x4]';[m
+[32m+[m[32mu_ut = [x1 x2 x3 x4];[m
+[1mdiff --git a/Futten_main.m b/Futten_main.m[m
+[1mindex 89716af..dd9d55d 100644[m
+[1m--- a/Futten_main.m[m
+[1m+++ b/Futten_main.m[m
+[36m@@ -1,8 +1,5 @@[m
+ % Projektarbete "Rymdskeppet Futten illa ute"[m
+ % Andreas Fröderberg & Henrik Hvitfeldt[m
+[31m-% Stanko Sprit & Strömningsmekanik AB[m
+[31m-% Rev 4[m
+[31m-% Solve ODE and plot curve.[m
+ close all; clear all; clc;[m
+ %% Declare variables[m
+ global check phi_err r_err t_err phi_dot_err[m
+[36m@@ -14,7 +11,6 @@[m [mh = 0.001;  % Step length used in RK4[m
+ % Runge Kuttas method while not crash and while not pass[m
+ disp('Part 1')[m
+ alpha = 90;[m
+[31m-c1 = [const alpha];[m
+ t_list = [];         % Empty vector of passing t:s[m
+ r_list = [];         % Empty vector of passing r:s[m
+ phi_list = [];       % Empty vector of passing phi:s[m
+[1mdiff --git a/RK4step.asv b/RK4step.asv[m
+[1mindex cff7168..9db8856 100644[m
+[1m--- a/RK4step.asv[m
+[1m+++ b/RK4step.asv[m
+[36m@@ -1,17 +1,13 @@[m
+[31m-function [uout, tout] = RK4step (u, h)[m
+[31m-% One step of Runge-Kutta Method 4 for solvning ODE[m
+[31m-% Input(System of ODE to be evaluated, Starting u, Starting t, Step Size,...[m
+[31m-%..., Starting angle, Gravitational pull at surface, Gravitational pull at start,...[m
+[31m-% ..., Earth radius)[m
+[31m-% c = Vector of constants [g R alpha G][m
+[31m-% Output[Nex u, new t][m
+[32m+[m[32mfunction [tout, uout] = RK4step (u, h)[m
+[32m+[m[32m% RK4STEP (t, u, h) calculates a step with RK4 method with step length h.[m[41m  [m
+ [m
+[31m-k1 = h*diff_ekv(u, c);[m
+[31m-k2 = h*diff_ekv(u+h*k1/2, c);[m
+[31m-k3 = h*diff_ekv(u+h*k2/2, c);[m
+[31m-k4 = h*diff_ekv(u+h*k3, c);[m
+[32m+[m
+[32m+[m[32m% RK4 factors[m
+[32m+[m[32mk1 = h*F(t, u);[m
+[32m+[m[32mk2 = h*F(t, u+h*k1/2);[m
+[32m+[m[32mk3 = h*F(t, u+h*k2/2);[m
+[32m+[m[32mk4 = h*F(t, u+h*k3);[m
+ [m
+ uout = u + (k1+2*k2+2*k3+k4)/6;[m
+ tout = t + h;[m
+ [m
+[31m-end[m
+\ No newline at end of file[m
+[1mdiff --git a/RK4step.m b/RK4step.m[m
+[1mindex 269f545..f27962a 100644[m
+[1m--- a/RK4step.m[m
+[1m+++ b/RK4step.m[m
+[36m@@ -1,13 +1,12 @@[m
+[31m-function [out] = RK4step (t, u, h)[m
+[31m-% RK4STEP (t, u, h) calculates a step with RK4 method with step length h. Returns a struct. [m
+[32m+[m[32mfunction [tout, uout] = RK4step (t, u, h)[m
+[32m+[m[32m% RK4STEP (t, u, h) calculates a step with RK4 method with step length h.[m[41m  [m
+ [m
+[31m-k1 = h*diff_ekv(u, c);[m
+[31m-k2 = h*diff_ekv(u+h*k1/2, c);[m
+[31m-k3 = h*diff_ekv(u+h*k2/2, c);[m
+[31m-k4 = h*diff_ekv(u+h*k3, c);[m
+[32m+[m[32m% RK4 factors[m
+[32m+[m[32mk1 = h*F(t, u);[m
+[32m+[m[32mk2 = h*F(t, u+h*k1/2);[m
+[32m+[m[32mk3 = h*F(t, u+h*k2/2);[m
+[32m+[m[32mk4 = h*F(t, u+h*k3);[m
+ [m
+ uout = u + (k1+2*k2+2*k3+k4)/6;[m
+ tout = t + h;[m
+ [m
+[31m-out = struct(   'u', uout,...[m
+[31m-                't', tout);[m
+[1mdiff --git a/RKeval.asv b/RKeval.asv[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4cefaa7[m
+[1m--- /dev/null[m
+[1m+++ b/RKeval.asv[m
+[36m@@ -0,0 +1,43 @@[m
+[32m+[m[32mfunction [trajectory] = RKeval (h, H)[m
+[32m+[m[32m% RKEVAL (h, H) Evaluates system until earth is passed or crashed into for[m
+[32m+[m[32m% st[m
+[32m+[m[32m% Used RK4step for evaluation.[m
+[32m+[m[32m% Returns struct with trajectory parameters[m
+[32m+[m
+[32m+[m[32minit_cond = [H 0 0 0];                          % Initial conditions[m
+[32m+[m[32mt = 0;                                          % Starting t[m
+[32m+[m[32mtrajectory = struct(    't',        t,...[m
+[32m+[m[32m                        'r',        inti_cond(1),...[m
+[32m+[m[32m                        'rdot',     init_cond(2),...[m
+[32m+[m[32m                        'phi',      init_cond(3),...[m
+[32m+[m[32m                        'phidot',   init_cond(4));[m
+[32m+[m
+[32m+[m
+[32m+[m[32m% Evaluates while rdot is negative[m
+[32m+[m[32mwhile trajectory.rdot <= 0[m[41m                        [m
+[32m+[m[32m    [u, t] = RK4step(u, t, h);       % RK step evaluation[m
+[32m+[m[32m    trajectory.t = [trajectory.t; t];[m
+[32m+[m[32m    trajectory.r = [trajectory.r; u(1)];[m
+[32m+[m[32m    trajectory.rdot = [trajectory.rdot; u(2)];[m
+[32m+[m[32m    trajectory.r = [trajectory.phi; u(3)];[m
+[32m+[m[32m    trajectory.r = [trajectory.phidot; u(4)];[m[41m  [m
+[32m+[m[32mend[m
+[32m+[m
+[32m+[m[32m%[m[41m [m
+[32m+[m[32m% % Interpolate passing t  with quadratic interpolation[m
+[32m+[m[32m% t_pass = quadinterpol(u_t(end-11:end,1),u_t(end-11:end,5));  % Interpolate t value when pass earth[m
+[32m+[m[32m% % Interpolate passing r with hermite interpolation[m
+[32m+[m[32m% t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[32m+[m[32m% r1 = u_t(end-1,1); r2 = u_t(end,1);[m
+[32m+[m[32m% r_prim1 = u_t(end-1,2); r_prim2 = u_t(end,2);[m
+[32m+[m[32m% r_pass = herm(t_pass, t1, t2, r1, r2, r_prim1, r_prim2, 'r');[m
+[32m+[m[32m% % Interpolate passing phi with hermite interpolation[m
+[32m+[m[32m% t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[32m+[m[32m% phi1 = u_t(end-1,3); phi2 = u_t(end,3);[m
+[32m+[m[32m% phi_prim1 = u_t(end-1,4); phi_prim2 = u_t(end,4);[m
+[32m+[m[32m% phi_pass = herm(t_pass, t1, t2, phi1, phi2, phi_prim1, phi_prim2,'phi');[m
+[32m+[m[32m% % Interpolate passing phi_dot using quadratic interpolation[m
+[32m+[m[32m% phi_dot_pass = quadinterpol_phidot(u_t(end-11:end,4),u_t(end-11:end,5),t_pass);[m
+[32m+[m
+[32m+[m
+[32m+[m[32mend[m
+\ No newline at end of file[m
+[1mdiff --git a/RKeval.m b/RKeval.m[m
+[1mindex 44a7210..84b35c7 100644[m
+[1m--- a/RKeval.m[m
+[1m+++ b/RKeval.m[m
+[36m@@ -1,45 +1,43 @@[m
+[31m-function [u_t, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval (h, H, c1)[m
+[31m-% Evaluates system until earth is passed or crashed into.[m
+[31m-% Used RK4step for evaluation[m
+[31m-% Input(Step length, vector with system info[r dr/dt phi dphi/dt t], Vector with constants)[m
+[31m-% Output[Values during flight, Crash(=1 yes, =0 No]                               % Starting time [h][m
+[31m-[m
+[31m-global check[m
+[31m-[m
+[31m-[m
+[31m-G = Grav(H, c1(1), c1(2));              % Calculates earth grav pull at starting height[m
+[31m-c1 = [c1 G];[m
+[31m-u1 = H;                                 % r-coordinate [Earth radii][m
+[31m-u2 = 0;                                 % dr/dt [Radii/h][m
+[31m-u3 = 0;                                 % phi angle [rad][m
+[31m-u4 = 0;                                 % dphi/dt [rad/h] [m
+[31m-u = [u1 u2 u3 u4];                      % Create starting state vector[m
+[31m-t = 0;                                  % Starting t[m
+[31m-u_t = [u t];                            % Vector containing all states and time [r dr/dt phi dphi/dt t][m
+[31m-pass = 0;[m
+[31m-[m
+[31m-% Evaluates while current r is less than previous r (pass condition)[m
+[31m-while u_t(end,2)<=0                        [m
+[31m-    [u_new, t_new] = RK4step(u_t(end,1:4), t, h, c1);       % RK step evaluation[m
+[31m-    u_t = [u_t; u_new t_new];                               % Add new values to old in matrix[m
+[31m-    t = t_new;                                              % Change to new t[m
+[32m+[m[32mfunction [trajectory] = RKeval (h, H)[m
+[32m+[m[32m% RKEVAL (h, H) Evaluates system until earth is passed or crashed into for[m
+[32m+[m[32m% starting height H and step lengt h.[m
+[32m+[m[32m% Used RK4step for evaluation.[m
+[32m+[m[32m% Returns struct with trajectory parameters[m
+[32m+[m
+[32m+[m[32mu = [H 0 0 0];                          % Initial conditions[m
+[32m+[m[32mt = 0;                                          % Starting t[m
+[32m+[m[32mtrajectory = struct(    't',        t,...[m
+[32m+[m[32m                        'r',        u(1),...[m
+[32m+[m[32m                        'rdot',     u(2),...[m
+[32m+[m[32m                        'phi',      u(3),...[m
+[32m+[m[32m                        'phidot',   u(4));[m
+[32m+[m
+[32m+[m
+[32m+[m[32m% Evaluates while rdot is negative[m
+[32m+[m[32mwhile trajectory.rdot <= 0[m[41m                        [m
+[32m+[m[32m    [t, u] = RK4step(t, u, h);       % RK step evaluation[m
+[32m+[m[32m    trajectory.t = [trajectory.t; t];[m
+[32m+[m[32m    trajectory.r = [trajectory.r; u(1)];[m
+[32m+[m[32m    trajectory.rdot = [trajectory.rdot; u(2)];[m
+[32m+[m[32m    trajectory.phi = [trajectory.phi; u(3)];[m
+[32m+[m[32m    trajectory.phidot = [trajectory.phidot; u(4)];[m[41m  [m
+ end[m
+ [m
+[31m-[m
+[31m-% Interpolate passing t  with quadratic interpolation[m
+[31m-t_pass = quadinterpol(u_t(end-11:end,1),u_t(end-11:end,5));  % Interpolate t value when pass earth[m
+[31m-% Interpolate passing r with hermite interpolation[m
+[31m-t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[31m-r1 = u_t(end-1,1); r2 = u_t(end,1);[m
+[31m-r_prim1 = u_t(end-1,2); r_prim2 = u_t(end,2);[m
+[31m-r_pass = herm(t_pass, t1, t2, r1, r2, r_prim1, r_prim2, 'r');[m
+[31m-% Interpolate passing phi with hermite interpolation[m
+[31m-t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[31m-phi1 = u_t(end-1,3); phi2 = u_t(end,3);[m
+[31m-phi_prim1 = u_t(end-1,4); phi_prim2 = u_t(end,4);[m
+[31m-phi_pass = herm(t_pass, t1, t2, phi1, phi2, phi_prim1, phi_prim2,'phi');[m
+[31m-% Interpolate passing phi_dot using quadratic interpolation[m
+[31m-phi_dot_pass = quadinterpol_phidot(u_t(end-11:end,4),u_t(end-11:end,5),t_pass);[m
+[32m+[m[32m%[m[41m [m
+[32m+[m[32m% % Interpolate passing t  with quadratic interpolation[m
+[32m+[m[32m% t_pass = quadinterpol(u_t(end-11:end,1),u_t(end-11:end,5));  % Interpolate t value when pass earth[m
+[32m+[m[32m% % Interpolate passing r with hermite interpolation[m
+[32m+[m[32m% t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[32m+[m[32m% r1 = u_t(end-1,1); r2 = u_t(end,1);[m
+[32m+[m[32m% r_prim1 = u_t(end-1,2); r_prim2 = u_t(end,2);[m
+[32m+[m[32m% r_pass = herm(t_pass, t1, t2, r1, r2, r_prim1, r_prim2, 'r');[m
+[32m+[m[32m% % Interpolate passing phi with hermite interpolation[m
+[32m+[m[32m% t1 = u_t(end-1,5); t2 = u_t(end,5);[m
+[32m+[m[32m% phi1 = u_t(end-1,3); phi2 = u_t(end,3);[m
+[32m+[m[32m% phi_prim1 = u_t(end-1,4); phi_prim2 = u_t(end,4);[m
+[32m+[m[32m% phi_pass = herm(t_pass, t1, t2, phi1, phi2, phi_prim1, phi_prim2,'phi');[m
+[32m+[m[32m% % Interpolate passing phi_dot using quadratic interpolation[m
+[32m+[m[32m% phi_dot_pass = quadinterpol_phidot(u_t(end-11:end,4),u_t(end-11:end,5),t_pass);[m
+ [m
+ [m
+ end[m
+\ No newline at end of file[m
+
+[33mcommit 6b44fdcf4883d78e91e8c1e7df74bdf1e827992b[m
+Author: AndFroSwe <gummianka88@gmail.com>
+Date:   Sun Oct 4 09:49:43 2015 +0200
+
+    Edited RK4 step function
+
+[1mdiff --git a/F.asv b/F.asv[m
+[1mnew file mode 100644[m
+[1mindex 0000000..993fd4d[m
+[1m--- /dev/null[m
+[1m+++ b/F.asv[m
+[36m@@ -0,0 +1,17 @@[m
+[32m+[m[32mfunction [u_ut] = F(t, u)[m
+[32m+[m[32m% F (t, u) returns derivatives of physical system.[m
+[32m+[m[32m% Output is [r rdot phi phidot][m
+[32m+[m
+[32m+[m[32mglobal alpha % Is global so no input is needed (for use in ode45)[m
+[32m+[m
+[32m+[m[32m% Define parameters[m
+[32m+[m[32mg = 20;                 % Gravity constant[earth radii/hour][m
+[32m+[m[32mR = 1;                  % Radius of earth[m
+[32m+[m[32mG = Grav(u(1), g, R);   % Engine force[m
+[32m+[m
+[32m+[m[32mx1 = u(2);[m
+[32m+[m[32mx2 = u(1)*u(4)^2+G*cosd(alpha)-g*(R/u(1))^2;[m
+[32m+[m[32mx3 = u(4);[m
+[32m+[m[32mx4 = (G*sind(alpha)-2*u(2)*u(4))/u(1);[m
+[32m+[m
+[32m+[m[32mu_ut = [x1 x2 x3 x4]';[m
+[1mdiff --git a/F.m b/F.m[m
+[1mnew file mode 100644[m
+[1mindex 0000000..993fd4d[m
+[1m--- /dev/null[m
+[1m+++ b/F.m[m
+[36m@@ -0,0 +1,17 @@[m
+[32m+[m[32mfunction [u_ut] = F(t, u)[m
+[32m+[m[32m% F (t, u) returns derivatives of physical system.[m
+[32m+[m[32m% Output is [r rdot phi phidot][m
+[32m+[m
+[32m+[m[32mglobal alpha % Is global so no input is needed (for use in ode45)[m
+[32m+[m
+[32m+[m[32m% Define parameters[m
+[32m+[m[32mg = 20;                 % Gravity constant[earth radii/hour][m
+[32m+[m[32mR = 1;                  % Radius of earth[m
+[32m+[m[32mG = Grav(u(1), g, R);   % Engine force[m
+[32m+[m
+[32m+[m[32mx1 = u(2);[m
+[32m+[m[32mx2 = u(1)*u(4)^2+G*cosd(alpha)-g*(R/u(1))^2;[m
+[32m+[m[32mx3 = u(4);[m
+[32m+[m[32mx4 = (G*sind(alpha)-2*u(2)*u(4))/u(1);[m
+[32m+[m
+[32m+[m[32mu_ut = [x1 x2 x3 x4]';[m
+[1mdiff --git a/Futten_main.m b/Futten_main.m[m
+[1mnew file mode 100644[m
+[1mindex 0000000..89716af[m
+[1m--- /dev/null[m
+[1m+++ b/Futten_main.m[m
+[36m@@ -0,0 +1,135 @@[m
+[32m+[m[32m% Projektarbete "Rymdskeppet Futten illa ute"[m
+[32m+[m[32m% Andreas Fröderberg & Henrik Hvitfeldt[m
+[32m+[m[32m% Stanko Sprit & Strömningsmekanik AB[m
+[32m+[m[32m% Rev 4[m
+[32m+[m[32m% Solve ODE and plot curve.[m
+[32m+[m[32mclose all; clear all; clc;[m
+[32m+[m[32m%% Declare variables[m
+[32m+[m[32mglobal check phi_err r_err t_err phi_dot_err[m
+[32m+[m[32mcheck = 0;   % Enables accuracy control of quadinterpol[m
+[32m+[m[32mglobal alpha[m
+[32m+[m[32mh = 0.001;  % Step length used in RK4[m
+[32m+[m
+[32m+[m[32m%% Part 1: Test H-values and calculate passing r, t and phi for alpha = 90[m
+[32m+[m[32m% Runge Kuttas method while not crash and while not pass[m
+[32m+[m[32mdisp('Part 1')[m
+[32m+[m[32malpha = 90;[m
+[32m+[m[32mc1 = [const alpha];[m
+[32m+[m[32mt_list = [];         % Empty vector of passing t:s[m
+[32m+[m[32mr_list = [];         % Empty vector of passing r:s[m
+[32m+[m[32mphi_list = [];       % Empty vector of passing phi:s[m
+[32m+[m[32mH_list = [];         % Empty vector of passing phi:s[m
+[32m+[m[32mcrash_list = [];     % Empty vector of passing phi:s[m
+[32m+[m
+[32m+[m[32m% Test trajectories for different H[m
+[32m+[m[32mfigure ()[m
+[32m+[m[32mcount = 1;                              % Set counter[m
+[32m+[m[32mplotStyle = {'b','g','r','m'};          % Set colors of trajectory plots[m
+[32m+[m[32mfor H = [10, 8, 6, 2]                   % Test H:s[m
+[32m+[m[32m    [u_t, t_pass, r_pass, phi_pass] = RKeval(h, H, c1);     % Evaluate trajecory with RK4[m
+[32m+[m[32m    H_list = [H_list H];                % Gather used H in list[m
+[32m+[m[32m    t_list = [t_list t_pass];           % Gather used t in list[m
+[32m+[m[32m    r_list = [r_list r_pass];           % Gather used r in list[m
+[32m+[m[32m    phi_list = [phi_list phi_pass];     % Gather used phi in list[m
+[32m+[m[32m    info = [H_list' r_list' phi_list' t_list'];   % Create matrix of end values[m
+[32m+[m[32m    polar(u_t(:,3),u_t(:,1),plotStyle{count})                      % Plot tracectory[m
+[32m+[m[32m    view([90 -90])                      % Flip plot to 0 deg up[m
+[32m+[m[32m    grid on; hold all;[m
+[32m+[m[32m    legendInfo{count} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command[m[41m   [m
+[32m+[m[32m    count = count + 1;[m
+[32m+[m[32mend[m
+[32m+[m[32mtitle ('Trajectories for different starting altitudes, \alpha =90')[m
+[32m+[m[32mlegend(legendInfo)                      % Set legends accoring to legend info[m
+[32m+[m
+[32m+[m[32m% Display results part 1[m
+[32m+[m
+[32m+[m[32mdisp('State of Futten when passing earth depending on starting height: ')[m
+[32m+[m[32minfo = sortrows(info,1);[m
+[32m+[m[32mdisp('    H         r         phi       t')    % Display results[m
+[32m+[m[32mdisp(info)[m
+[32m+[m
+[32m+[m[32m%% Part 2 Find H*, H when Futten just passes earth[m
+[32m+[m
+[32m+[m[32m% Bisection method to determine critical starting height, H_star, when[m[41m [m
+[32m+[m[32m% trajectory just passes earth.[m
+[32m+[m[32mH_star = bisection_meth(@RKeval, 3, 6, 40, 0.05, 0, h, c1)[m
+[32m+[m[32m% Evaluate trajectory for H_star[m
+[32m+[m[32mcheck = 1; % Enable accuracy check[m
+[32m+[m[32m[u_t_star, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval(h, H_star, c1);[m
+[32m+[m[32m% Test convergence of RK method[m
+[32m+[m[32mh2 = h*2;[m
+[32m+[m[32m[u_t_star2, t_pass2, r_pass2, phi_pass2] = RKeval(h2, H_star, c1);[m
+[32m+[m[32mRK_err = abs(r_pass-r_pass2);[m
+[32m+[m[32m% Calculate trajectory length[m
+[32m+[m[32mtraj_length = arclength(u_t_star)[m
+[32m+[m[32mfigure()[m
+[32m+[m[32mr_path = u_t_star(:,1); phi_path = u_t_star(:,3); % Extract path info[m
+[32m+[m[32mpolar(phi_path, r_path,'r')[m
+[32m+[m[32mtitle('Trajectory at critical H, \alpha =90')[m
+[32m+[m[32mview([90 -90])[m
+[32m+[m[32mhold on;[m
+[32m+[m[32mphi_earth = 0:1/(length(r_path))*360:360;[m
+[32m+[m[32mr_earth = ones(1,length(r_path)+1);[m
+[32m+[m[32mpolar(phi_earth,r_earth,'b')[m
+[32m+[m[32mlegend('Trajectory','Earth')[m
+[32m+[m[32mpass_speed = phi_dot_pass;[m
+[32m+[m
+[32m+[m
+[32m+[m[32m%% Part 3 Find H* for different alphas[m
+[32m+[m
+[32m+[m[32mH_star_alpha = [];[m
+[32m+[m[32malpha_list = [];[m
+[32m+[m[32mpass_speed_list = [];[m
+[32m+[m[32mfor alpha = [70:10:130][m
+[32m+[m[32m    check = 0;[m
+[32m+[m[32m    c1 = [const alpha];[m
+[32m+[m[32m    H_alpha = bisection_meth(@RKeval, 3, 6, 40, 0.001, 0, h, c1);[m
+[32m+[m[32m    H_star_alpha = [H_star_alpha H_alpha];[m
+[32m+[m[32m    alpha_list = [alpha_list alpha];[m
+[32m+[m[32m    [u_t3, t_pass3, r_pass3, phi_pass3, phi_dot_pass3] = RKeval(h, H_alpha, c1);[m
+[32m+[m[32m    pass_speed_list = [pass_speed_list phi_dot_pass3];[m
+[32m+[m[32mend[m
+[32m+[m
+[32m+[m[32m%%[m
+[32m+[m
+[32m+[m[32merr_tot=RK_err+0.001 %för vilket H som vi passerar med[m
+[32m+[m
+[32m+[m[32mvelocityerror=r_err*phi_err %+- this lies our velocityerror[m
+[32m+[m
+[32m+[m[32mtraj_error= 5.2075-traj_length[m
+[32m+[m
+[32m+[m[32mT=u_t_star(:,5);[m
+[32m+[m[32mRadie=u_t_star(:,1);[m
+[32m+[m[32mTheta_star=u_t_star(;,3);[m
+[32m+[m[32mX=Radie.*sin(Theta_star);[m
+[32m+[m[32mY=Radie.*cos(Theta_star);[m
+[32m+[m
+[32m+[m[32mgrad=2;[m
+[32m+[m[32mfor a=1:grad+1                  %constructing the matrix A of T(t)=R[m
+[32m+[m[32m   A(:,a)=T.^(grad+1-a);[m
+[32m+[m[32mend                            %least square to solve R as a function of T[m
+[32m+[m[32m ;[m
+[32m+[m[32m AT=A'*A;[m
+[32m+[m[32m b=A'*Y;[m
+[32m+[m[32m c=AT\b;[m
+[32m+[m[32mfor a=1:grad+1[m
+[32m+[m[32m    g(a)=c(a)*(grad+1-a);       %derivate R as a polynom[m
+[32m+[m[32mend[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32mfigure()[m
+[32m+[m[32mplot (u_t_star(:,5),u_t_star(:,1))[m
+[32m+[m[32mgrid on[m
+[32m+[m[32mhold on[m
+[32m+[m[32mx_range=[0:0.0001:u_t_star(end,5)];[m
+[32m+[m[32my_range=polyval (c,x_range);[m
+[32m+[m[32mplot (x_range,y_range,'r');[m
+[32m+[m[32mlegend('Values from RK','Values from polynom')[m
+[32m+[m[32mtitle ('interpolated polynom versus RK values')[m
+[32m+[m[32mxlable =('t [h]')[m
+[32m+[m[32mylable =('r [earth radii]');[m
+[32m+[m
+[32m+[m
+[32m+[m
+[1mdiff --git a/Futten_main_rev1.m b/Futten_main_rev1.m[m
+[1mdeleted file mode 100644[m
+[1mindex c1deb2b..0000000[m
+[1m--- a/Futten_main_rev1.m[m
+[1m+++ /dev/null[m
+[36m@@ -1,39 +0,0 @@[m
+[31m-% Projektarbete "Rymdskeppet Futten illa ute"[m
+[31m-% Andreas Fröderberg & Henrik Hvitfeldt[m
+[31m-% Stanko Sprit & Strömningsmekanik AB?[m
+[31m-% Rev 1[m
+[31m-% Create main program with empty functions[m
+[31m-close all; clear all; clc;[m
+[31m-%% Define variables[m
+[31m-% Function containing all variables[m
+[31m-[c1] = global_var;                      % c = Vector of constants [g, R][m
+[31m-t = 0;                                  % Starting time [h][m
+[31m-% Starting values Part 1[m
+[31m-alpha = 50;                             % [deg][m
+[31m-H = 10;                                 % [Earth radii][m
+[31m-G = Grav(H, c1(1), c1(2));              % Calculates earth grav pull at starting height[m
+[31m-u1 = H;                                 % r-coordinate [Earth radii][m
+[31m-u2 = 0;                                 % dr/dt [Radii/h][m
+[31m-u3 = 0;                                 % phi angle [rad][m
+[31m-u4 = 0;                                 % dphi/dt [rad/h] [m
+[31m-u = [u1 u2 u3 u4];                      % Create starting state vector[m
+[31m-u_t = [u t];                            % Vector containing all states and time [r dr/dt phi dphi/dt t][m
+[31m-c1 = [c1 alpha G];                      % Vector of constants [g R alpha G][m
+[31m-%% Part 1: Solve ODE[m
+[31m-h = 0.1;                                % Step length [h][m
+[31m-pass = 1;                               % Pass earth condition [m
+[31m-while u_t(end,1) >= 1 && pass >= 0      % Runge Kuttas method while not crash and while not pass[m
+[31m-    [u_new t_new] = RK4step(u_t(end,1:4), t, h, c1);        % RK step[m
+[31m-    u_t = [u_t; u_new t_new];                               % Add new values to old in matrix[m
+[31m-    pass = u_t(end-1,1) - u_t(end,1)                        % Pass if new r is bigger than old[m
+[31m-    t = t_new;                                              % Change to new t[m
+[31m-end[m
+[31m-[m
+[31m-disp(u_t)[m
+[31m-% figure (1)[m
+[31m-% [m
+[31m-% polar(ones(length(u_t),1))[m
+[31m-% hold on[m
+[31m-% polar(u_t(:,3),u_t(:,1))[m
+[31m-% view([90 -90])[m
+[31m-[m
+[1mdiff --git a/Futten_main_rev2.m b/Futten_main_rev2.m[m
+[1mdeleted file mode 100644[m
+[1mindex fe95f94..0000000[m
+[1m--- a/Futten_main_rev2.m[m
+[1m+++ /dev/null[m
+[36m@@ -1,55 +0,0 @@[m
+[31m-% Projektarbete "Rymdskeppet Futten illa ute"[m
+[31m-% Andreas Fröderberg & Henrik Hvitfeldt[m
+[31m-% Stanko Sprit & Strömningsmekanik AB?[m
+[31m-% Rev 2[m
+[31m-% Solve ODE and plot curve.[m
+[31m-close all; clear all; clc;[m
+[31m-%% Define variables[m
+[31m-% Function containing all variables[m
+[31m-c1 = global_var;                      % c = Vector of constants [g, R][m
+[31m-t = 0;                                  % Starting time [h][m
+[31m-% Starting values Part 1[m
+[31m-alpha = 90;                             % [deg][m
+[31m-H = 7;                                  % [Earth radii][m
+[31m-G = Grav(H, c1(1), c1(2));              % Calculates earth grav pull at starting height[m
+[31m-u1 = H;                                 % r-coordinate [Earth radii][m
+[31m-u2 = 0;                                 % dr/dt [Radii/h][m
+[31m-u3 = 0;                                 % phi angle [rad][m
+[31m-u4 = 0;                                 % dphi/dt [rad/h] [m
+[31m-u = [u1 u2 u3 u4];                      % Create starting state vector[m
+[31m-u_t = [u t];                            % Vector containing all states and time [r dr/dt phi dphi/dt t][m
+[31m-c1 = [c1, alpha G];                      % Vector of constants [g R alpha G][m
+[31m-%% Part 1: Solve ODE[m
+[31m-n = 8*10;[m
+[31m-h = 1/n;                                % Step length [h][m
+[31m-pass = 1;                               % Pass earth condition[m
+[31m-i = 1;                                  % Counter  [m
+[31m-[m
+[31m-% Runge Kuttas method while not crash and while not pass[m
+[31m-while u_t(end,1) >= 1 && pass >= 0                          [m
+[31m-    [u_new, t_new] = RK4step(u_t(end,1:4), t, h, c1);        % RK step[m
+[31m-    u_t = [u_t; u_new t_new];                               % Add new values to old in matrix[m
+[31m-    pass = u_t(end-1,1) - u_t(end,1);                       % Pass if new r is bigger than old[m
+[31m-    t = t_new;                                              % Change to new t[m
+[31m-    i=i+1;[m
+[31m-    [m
+[31m-end[m
+[31m-% Crash control[m
+[31m-if u_t(end,1) >= 1[m
+[31m-        crash = 0;[m
+[31m-    else[m
+[31m-        crash = 1;[m
+[31m-        disp('NOOOOOOOOO')[m
+[31m-end[m
+[31m-% disp(u_t)[m
+[31m-figure ()[m
+[31m-% radius = ones(1,1000);[m
+[31m-% theta = 0:180/(length(radius)-1):180[m
+[31m-% polar(theta,radius)[m
+[31m-% hold on[m
+[31m-polar(u_t(:,3),u_t(:,1))[m
+[31m-view([90 -90])[m
+[31m-[m
+[31m-if crash == 0[m
+[31m-    [end_values, V] = linearinterpol(u_t);[m
+[31m-end[m
+[1mdiff --git a/Futten_main_rev3.m b/Futten_main_rev3.m[m
+[1mdeleted file mode 100644[m
+[1mindex 4a35b03..0000000[m
+[1m--- a/Futten_main_rev3.m[m
+[1m+++ /dev/null[m
+[36m@@ -1,47 +0,0 @@[m
+[31m-% Projektarbete "Rymdskeppet Futten illa ute"[m
+[31m-% Andreas Fröderberg & Henrik Hvitfeldt[m
+[31m-% Stanko Sprit & Strömningsmekanik AB[m
+[31m-% Rev 3[m
+[31m-% Solve ODE and plot curve.[m
+[31m-close all; clear all; clc;[m
+[31m-%% Define variables[m
+[31m-% Function containing all variables[m
+[31m-c1 = global_var;                        % c = Vector of constants [g, R][m
+[31m-t = 0;                                  % Starting time [h][m
+[31m-% Starting values Part 1[m
+[31m-alpha = 90;                              % [deg][m
+[31m-H = 6;                                  % [Earth radii][m
+[31m-G = Grav(H, c1(1), c1(2));              % Calculates earth grav pull at starting height[m
+[31m-u1 = H;                                 % r-coordinate [Earth radii][m
+[31m-u2 = 0;                                 % dr/dt [Radii/h][m
+[31m-u3 = 0;                                 % phi angle [rad][m
+[31m-u4 = 0;                                 % dphi/dt [rad/h] [m
+[31m-u = [u1 u2 u3 u4];                      % Create starting state vector[m
+[31m-u_t = [u t];                            % Vector containing all states and time [r dr/dt phi dphi/dt t][m
+[31m-c1 = [c1, alpha G];                     % Vector of constants [g R alpha G][m
+[31m-h = 0.001;[m
+[31m-%% Part 1: Find approximate H value that passes earth[m
+[31m-% Runge Kuttas method while not crash and while not pass[m
+[31m-[u_t, crash] = RKeval(h, u_t, c1);[m
+[31m-[m
+[31m-[m
+[31m-%% Part 2 Find H*, H when Futten just passes earth[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-figure ()[m
+[31m-polar(u_t(:,3),u_t(:,1))[m
+[31m-view([90 -90])[m
+[31m-[m
+[31m-if crash == 0[m
+[31m-R=[u_t(end-2,1) u_t(end-1,1) u_t(end,1)];[m
+[31m-T=[u_t(end-2,5) u_t(end-1,5) u_t(end,5)];[m
+[31m-T0 = linearinterpol(R,T);[m
+[31m-vikt=(T0-T(2))/(T(3)-T(2));[m
+[31m-Rprim=(u_t(end,2)-u_t(end-1,2))*vikt+u_t(end-1,2);[m
+[31m-[m
+[31m-end[m
+[1mdiff --git a/Futten_main_rev4.m b/Futten_main_rev4.m[m
+[1mdeleted file mode 100644[m
+[1mindex dcf54c0..0000000[m
+[1m--- a/Futten_main_rev4.m[m
+[1m+++ /dev/null[m
+[36m@@ -1,137 +0,0 @@[m
+[31m-% Projektarbete "Rymdskeppet Futten illa ute"[m
+[31m-% Andreas Fröderberg & Henrik Hvitfeldt[m
+[31m-% Stanko Sprit & Strömningsmekanik AB[m
+[31m-% Rev 4[m
+[31m-% Solve ODE and plot curve.[m
+[31m-close all; clear all; clc;[m
+[31m-%% Define variables[m
+[31m-% Function containing all variables[m
+[31m-global check phi_err r_err t_err phi_dot_err[m
+[31m-check = 0;   % Enables accuracy control of quadinterpol[m
+[31m-const = global_var;                        % c = Vector of constants [g, R][m
+[31m-h = 0.001;[m
+[31m-%% Part 1: Test H-values and calculate passing r, t and phi for alpha = 90[m
+[31m-% Runge Kuttas method while not crash and while not pass[m
+[31m-disp('Part 1')[m
+[31m-alpha = 90;[m
+[31m-c1 = [const alpha];[m
+[31m-t_list = [];         % Empty vector of passing t:s[m
+[31m-r_list = [];         % Empty vector of passing r:s[m
+[31m-phi_list = [];       % Empty vector of passing phi:s[m
+[31m-H_list = [];         % Empty vector of passing phi:s[m
+[31m-crash_list = [];     % Empty vector of passing phi:s[m
+[31m-[m
+[31m-% Test trajectories for different H[m
+[31m-figure ()[m
+[31m-count = 1;                              % Set counter[m
+[31m-plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots[m
+[31m-for H = [10, 8, 6, 2]                   % Test H:s[m
+[31m-    [u_t, t_pass, r_pass, phi_pass] = RKeval(h, H, c1);     % Evaluate trajecory with RK4[m
+[31m-    H_list = [H_list H];                % Gather used H in list[m
+[31m-    t_list = [t_list t_pass];           % Gather used t in list[m
+[31m-    r_list = [r_list r_pass];           % Gather used r in list[m
+[31m-    phi_list = [phi_list phi_pass];     % Gather used phi in list[m
+[31m-    info = [H_list' r_list' phi_list' t_list'];   % Create matrix of end values[m
+[31m-    polar(u_t(:,3),u_t(:,1),plotStyle{count})                      % Plot tracectory[m
+[31m-    view([90 -90])                      % Flip plot to 0 deg up[m
+[31m-    grid on; hold all;[m
+[31m-    legendInfo{count} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   [m
+[31m-    count = count + 1;[m
+[31m-end[m
+[31m-title ('Trajectories for different starting altitudes, \alpha =90')[m
+[31m-legend(legendInfo)                      % Set legends accoring to legend info[m
+[31m-[m
+[31m-% Display results part 1[m
+[31m-[m
+[31m-disp('State of Futten when passing earth depending on starting height: ')[m
+[31m-info = sortrows(info,1);[m
+[31m-disp('    H         r         phi       t')    % Display results[m
+[31m-disp(info)[m
+[31m-[m
+[31m-%% Part 2 Find H*, H when Futten just passes earth[m
+[31m-[m
+[31m-% Bisection method to determine critical starting height, H_star, when [m
+[31m-% trajectory just passes earth.[m
+[31m-H_star = bisection_meth(@RKeval, 3, 6, 40, 0.05, 0, h, c1);[m
+[31m-% Evaluate trajectory for H_star[m
+[31m-check = 1; % Enable accuracy check[m
+[31m-[u_t_star, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval(h, H_star, c1);[m
+[31m-% Test convergence of RK method[m
+[31m-h2 = h*2;[m
+[31m-[u_t_star2, t_pass2, r_pass2, phi_pass2] = RKeval(h2, H_star, c1);[m
+[31m-RK_err = abs(r_pass-r_pass2);[m
+[31m-% Calculate trajectory length[m
+[31m-traj_length = arclength(u_t_star)[m
+[31m-figure()[m
+[31m-r_path = u_t_star(:,1); phi_path = u_t_star(:,3); % Extract path info[m
+[31m-polar(phi_path, r_path,'r')[m
+[31m-title('Trajectory at critical H, \alpha =90')[m
+[31m-view([90 -90])[m
+[31m-hold on;[m
+[31m-phi_earth = 0:1/(length(r_path))*360:360;[m
+[31m-r_earth = ones(1,length(r_path)+1);[m
+[31m-polar(phi_earth,r_earth,'b')[m
+[31m-legend('Trajectory','Earth')[m
+[31m-pass_speed = phi_dot_pass;[m
+[31m-[m
+[31m-[m
+[31m-%% Part 3 Find H* for different alphas[m
+[31m-[m
+[31m-H_star_alpha = [];[m
+[31m-alpha_list = [];[m
+[31m-pass_speed_list = [];[m
+[31m-for alpha = [70:10:130][m
+[31m-    check = 0;[m
+[31m-    c1 = [const alpha];[m
+[31m-    H_alpha = bisection_meth(@RKeval, 3, 6, 40, 0.001, 0, h, c1);[m
+[31m-    H_star_alpha = [H_star_alpha H_alpha];[m
+[31m-    alpha_list = [alpha_list alpha];[m
+[31m-    [u_t3, t_pass3, r_pass3, phi_pass3, phi_dot_pass3] = RKeval(h, H_alpha, c1);[m
+[31m-    pass_speed_list = [pass_speed_list phi_dot_pass3];[m
+[31m-end
