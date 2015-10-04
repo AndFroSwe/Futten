@@ -1,26 +1,26 @@
 function [trajectory] = RKeval (h, H)
 % RKEVAL (h, H) Evaluates system until earth is passed or crashed into for
-% starting height H and step lengt h.
+% st
 % Used RK4step for evaluation.
 % Returns struct with trajectory parameters
 
-u = [H 0 0 0];                          % Initial conditions
+init_cond = [H 0 0 0];                          % Initial conditions
 t = 0;                                          % Starting t
 trajectory = struct(    't',        t,...
-                        'r',        u(1),...
-                        'rdot',     u(2),...
-                        'phi',      u(3),...
-                        'phidot',   u(4));
+                        'r',        inti_cond(1),...
+                        'rdot',     init_cond(2),...
+                        'phi',      init_cond(3),...
+                        'phidot',   init_cond(4));
 
 
 % Evaluates while rdot is negative
 while trajectory.rdot <= 0                        
-    [t, u] = RK4step(t, u, h);       % RK step evaluation
+    [u, t] = RK4step(u, t, h);       % RK step evaluation
     trajectory.t = [trajectory.t; t];
     trajectory.r = [trajectory.r; u(1)];
     trajectory.rdot = [trajectory.rdot; u(2)];
-    trajectory.phi = [trajectory.phi; u(3)];
-    trajectory.phidot = [trajectory.phidot; u(4)];  
+    trajectory.r = [trajectory.phi; u(3)];
+    trajectory.r = [trajectory.phidot; u(4)];  
 end
 
 % 

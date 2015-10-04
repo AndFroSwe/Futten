@@ -14,4 +14,4 @@ x2 = u(1)*u(4)^2+G*cosd(alpha)-g*(R/u(1))^2;
 x3 = u(4);
 x4 = (G*sind(alpha)-2*u(2)*u(4))/u(1);
 
-u_ut = [x1 x2 x3 x4]';
+u_ut = [x1 x2 x3 x4];

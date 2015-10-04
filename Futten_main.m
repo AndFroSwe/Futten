@@ -1,8 +1,5 @@
 % Projektarbete "Rymdskeppet Futten illa ute"
 % Andreas Fröderberg & Henrik Hvitfeldt
-% Stanko Sprit & Strömningsmekanik AB
-% Rev 4
-% Solve ODE and plot curve.
 close all; clear all; clc;
 %% Declare variables
 global check phi_err r_err t_err phi_dot_err
@@ -14,7 +11,6 @@ h = 0.001;  % Step length used in RK4
 % Runge Kuttas method while not crash and while not pass
 disp('Part 1')
 alpha = 90;
-c1 = [const alpha];
 t_list = [];         % Empty vector of passing t:s
 r_list = [];         % Empty vector of passing r:s
 phi_list = [];       % Empty vector of passing phi:s
