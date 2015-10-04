@@ -4,17 +4,7 @@ function [root] = bisection_meth (fhandle, start1, start2, it_allowed, delta, pr
 % size of h (dx) allowed.
 % Input(Function handle, Starting guess 1, Starting guess 2, Allowed number of iterations, Precision...
 %  ..., If print_it = 1 iterations are displayed)
-% Output[Approximate root]
-% clc; clear all; close all;
-% 
-% fhandle = @RKeval;
-% start1 = 2;
-% start2 = 6;
-% it_allowed = 40;
-% delta = 0.05;
-% print_it = 1;
-% h = 0.001;
-% c1 = [20 1 90];
+
 
 x0 = start1; x1 = start2; it = 1;       % Starting values, it = iteration counter
 [u0 t0 r0 phi0] = feval(fhandle, h, x0, c1);                 % Evaluate function at starting value 1

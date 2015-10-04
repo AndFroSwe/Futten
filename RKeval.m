@@ -3,11 +3,6 @@ function [u_t, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval (h, H, c1)
 % Used RK4step for evaluation
 % Input(Step length, vector with system info[r dr/dt phi dphi/dt t], Vector with constants)
 % Output[Values during flight, Crash(=1 yes, =0 No]                               % Starting time [h]
-% clc; clear all; close all;
-% alpha = 90;
-% c1 = [20 1 alpha];
-% H = 4.9;
-% h = 0.001;
 
 global check
 
@@ -28,7 +23,6 @@ while u_t(end,2)<=0
     [u_new, t_new] = RK4step(u_t(end,1:4), t, h, c1);       % RK step evaluation
     u_t = [u_t; u_new t_new];                               % Add new values to old in matrix
     t = t_new;                                              % Change to new t
-    
 end
 
 

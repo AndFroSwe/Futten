@@ -4,12 +4,12 @@
 % Rev 4
 % Solve ODE and plot curve.
 close all; clear all; clc;
-%% Define variables
-% Function containing all variables
+%% Declare variables
 global check phi_err r_err t_err phi_dot_err
 check = 0;   % Enables accuracy control of quadinterpol
-const = global_var;                        % c = Vector of constants [g, R]
-h = 0.001;
+global alpha
+h = 0.001;  % Step length used in RK4
+
 %% Part 1: Test H-values and calculate passing r, t and phi for alpha = 90
 % Runge Kuttas method while not crash and while not pass
 disp('Part 1')
@@ -52,7 +52,7 @@ disp(info)
 
 % Bisection method to determine critical starting height, H_star, when 
 % trajectory just passes earth.
-H_star = bisection_meth(@RKeval, 3, 6, 40, 0.05, 0, h, c1);
+H_star = bisection_meth(@RKeval, 3, 6, 40, 0.05, 0, h, c1)
 % Evaluate trajectory for H_star
 check = 1; % Enable accuracy check
 [u_t_star, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval(h, H_star, c1);
@@ -90,34 +90,32 @@ for alpha = [70:10:130]
     pass_speed_list = [pass_speed_list phi_dot_pass3];
 end
 
- 
-
-
-
-
 %%
 
 err_tot=RK_err+0.001 %för vilket H som vi passerar med
 
-
 velocityerror=r_err*phi_err %+- this lies our velocityerror
 
-traj_error= 5.2075-5.1719
+traj_error= 5.2075-traj_length
 
 T=u_t_star(:,5);
-R=u_t_star(:,1);
+Radie=u_t_star(:,1);
+Theta_star=u_t_star(;,3);
+X=Radie.*sin(Theta_star);
+Y=Radie.*cos(Theta_star);
+
 grad=2;
 for a=1:grad+1                  %constructing the matrix A of T(t)=R
    A(:,a)=T.^(grad+1-a);
 end                            %least square to solve R as a function of T
- y=R;
+ ;
  AT=A'*A;
- b=A'*y;
+ b=A'*Y;
  c=AT\b;
 for a=1:grad+1
     g(a)=c(a)*(grad+1-a);       %derivate R as a polynom
 end
-%b=(g(1:grad));
+
 
 
 
