@@ -18,29 +18,25 @@ H_list = [];         % Empty vector of passing phi:s
 crash_list = [];     % Empty vector of passing phi:s
 starting_heights = [10, 8, 6, 2];
 
-% Test trajectories for different H
+% Test and plot trajectories for different H
 figure ()
-count = 1;                              % Set counter
 plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots
-trajectories = zeros(1, length(start_heights))  % Initiate empty vector
-for i = length(starting_heights)                   % Test H:s
+trajectories = [];  % Initiate empty vector
+for i = 1:length(starting_heights)                   % Test H:s
     H = starting_heights(i);
     trajectory = RKeval(h, H);     % Evaluate trajecory with RK4
-    
-    polar(u_t(:,3),u_t(:,1),plotStyle{count})                      % Plot tracectory
+    %trajectories(i) = trajectory
+    % Plot trajectory
+    polar(trajectory.phi, trajectory.r, plotStyle{i})                      % Plot tracectory
     view([90 -90])                      % Flip plot to 0 deg up
     grid on; hold all;
-    legendInfo{count} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   
+    legendInfo{i} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   
 end
 title ('Trajectories for different starting altitudes, \alpha =90')
 legend(legendInfo)                      % Set legends accoring to legend info
 
 % Display results part 1
-
 disp('State of Futten when passing earth depending on starting height: ')
-info = sortrows(info,1);
-disp('    H         r         phi       t')    % Display results
-disp(info)
 
 %% Part 2 Find H*, H when Futten just passes earth
 

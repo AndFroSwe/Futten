@@ -20,17 +20,16 @@ starting_heights = [10, 8, 6, 2];
 
 % Test and plot trajectories for different H
 figure ()
-count = 1;                              % Set counter
 plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots
-trajectories = zeros(1, length(starting_heights))  % Initiate empty vector
 for i = 1:length(starting_heights)                   % Test H:s
     H = starting_heights(i);
     trajectory = RKeval(h, H);     % Evaluate trajecory with RK4
+    trajectories(i) = trajectory
     % Plot trajectory
-    polar(trajectory.r, trajectory.phi, plotStyle{i})                      % Plot tracectory
+    polar(trajectory.phi, trajectory.r, plotStyle{i})                      % Plot tracectory
     view([90 -90])                      % Flip plot to 0 deg up
     grid on; hold all;
-    legendInfo{count} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   
+    legendInfo{i} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   
 end
 title ('Trajectories for different starting altitudes, \alpha =90')
 legend(legendInfo)                      % Set legends accoring to legend info
