@@ -24,7 +24,7 @@ while trajectory.rdot <= 0
 end
 
 % 
-% % Interpolate passing t  with quadratic interpolation
+  %Interpolate passing t  with quadratic interpolation
 % t_pass = quadinterpol(u_t(end-11:end,1),u_t(end-11:end,5));  % Interpolate t value when pass earth
 % % Interpolate passing r with hermite interpolation
 % t1 = u_t(end-1,5); t2 = u_t(end,5);

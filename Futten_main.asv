@@ -21,11 +21,10 @@ starting_heights = [10, 8, 6, 2];
 % Test and plot trajectories for different H
 figure ()
 plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots
-trajectories = [];  % Initiate empty vector
 for i = 1:length(starting_heights)                   % Test H:s
     H = starting_heights(i);
     trajectory = RKeval(h, H);     % Evaluate trajecory with RK4
-    %trajectories(i) = trajectory
+    trajectories(i) = trajectory;
     % Plot trajectory
     polar(trajectory.phi, trajectory.r, plotStyle{i})                      % Plot tracectory
     view([90 -90])                      % Flip plot to 0 deg up
@@ -34,6 +33,8 @@ for i = 1:length(starting_heights)                   % Test H:s
 end
 title ('Trajectories for different starting altitudes, \alpha =90')
 legend(legendInfo)                      % Set legends accoring to legend info
+
+for 
 
 % Display results part 1
 disp('State of Futten when passing earth depending on starting height: ')

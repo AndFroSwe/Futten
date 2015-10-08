@@ -1,5 +1,6 @@
 function yut = herm(xq,x,y,k)
-% HERM (xq,x,y,k)
+% HERM ((x,x1,x2,y1,y2,k1,k2))
+x=xq
 x1=x(1);
 x2=x(2);
 y1=y(1);
@@ -14,7 +15,7 @@ c2 = (y2-y1)/h;
 c3 = (k2-c2)/h^2;
 c4 = (k1-c2)/h^2;
 
-yut = c1+c2*(xq-x1)+c3*(xq-x1)^2*(xq-x2)+c4*(xq-x1)*(xq-x2)^2;
+yut = c1+c2*(x-x1)+c3*(x-x1)^2*(x-x2)+c4*(x-x1)*(x-x2)^2;
 
           
 end

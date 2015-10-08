@@ -1,4 +1,4 @@
-function [c, g] = LS_interpol(x, y, order)
+function [c] = LS_interpol(x, y, order)
 % LS_INTERPOL (vec, order) uses Least Squares to interpolate polynomial to specified order
 % from dataset vec.
 
@@ -10,11 +10,4 @@ end
 
 c = A\y;
 
-g = [];
-for a=1:order+1
-    g(a)=c(a)*(order+1-a);       %derivate R as a polynom
-end
-
-%b=(g(1:order));
-%T0=roots (b);                  %time where R'=0    
 
