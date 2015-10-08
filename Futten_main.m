@@ -24,7 +24,7 @@ plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots
 for i = 1:length(starting_heights)                   % Test H:s
     H = starting_heights(i);
     trajectory = RKeval(h, H);     % Evaluate trajecory with RK4
-    trajectories(i) = trajectory
+    trajectories(i) = trajectory; 
     % Plot trajectory
     polar(trajectory.phi, trajectory.r, plotStyle{i})                      % Plot tracectory
     view([90 -90])                      % Flip plot to 0 deg up
