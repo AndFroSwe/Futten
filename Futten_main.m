@@ -2,7 +2,6 @@
 % Andreas Fröderberg & Henrik Hvitfeldt
 close all; clear all; clc;
 %% Declare variables
-global check phi_err r_err t_err phi_dot_err
 check = 0;   % Enables accuracy control of quadinterpol
 global alpha
 h = 0.001;  % Step length used in RK4
@@ -46,17 +45,17 @@ trajectories=trajectories_temp;
 make_table(trajectories)
 
 %% Part 2 Find H*, H when Futten just passes earth
-
 % Bisection method to determine critical starting height, H_star, when 
 % trajectory just passes earth.
-H_star = bisection_meth(@RKeval, 3, 6, 40, 0.05, 0, h, c1)
+start1=3; %first start value for bisection method
+start2=6; %second startvalue for bisection method
+start=[start1 start2];
+
+H_star = bisection_meth(@futt_extra, start, h)
 % Evaluate trajectory for H_star
-check = 1; % Enable accuracy check
-[u_t_star, t_pass, r_pass, phi_pass, phi_dot_pass] = RKeval(h, H_star, c1);
-% Test convergence of RK method
-h2 = h*2;
-[u_t_star2, t_pass2, r_pass2, phi_pass2] = RKeval(h2, H_star, c1);
-RK_err = abs(r_pass-r_pass2);
+trajectory_star = RKeval(h, H_star);
+
+%%
 % Calculate trajectory length
 traj_length = arclength(u_t_star)
 figure()
