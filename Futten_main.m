@@ -43,7 +43,7 @@ trajectories=trajectories_temp;
 
 
 % Display results part 1
-disp('State of Futten when passing earth depending on starting height: ')
+make_table(trajectories)
 
 %% Part 2 Find H*, H when Futten just passes earth
 
