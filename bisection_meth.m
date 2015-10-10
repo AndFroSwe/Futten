@@ -7,7 +7,7 @@ function [root] = bisection_meth (fhandle, start, h)
 % Finds root for function 'fhandle' using bisection method. Precision is
 % size of h (dx) allowed.
 
-delta = 0.01;
+delta = 0.0001;
 it_allowed = 100;
 x0 = start(1); 
 x1 = start(2); 

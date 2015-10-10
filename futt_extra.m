@@ -4,6 +4,7 @@ function [r_out]=futt_extra(h, H)
 %for H.
 
 trajectory=RKeval(h,H);
+
 trajectory_pass=futten_pass(trajectory);
 r_out=trajectory_pass.r_pass-1; %needs to be aiming for zero for the root finding method.
 
