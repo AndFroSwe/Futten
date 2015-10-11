@@ -54,7 +54,7 @@ start=[start1 start2];
 H_star = bisection_meth(@futt_extra, start, h)
 % Evaluate trajectory for H_star
 trajectory_star = RKeval(h, H_star);
-trajectory_star_pass=futten_pass(trajectory_star)
+trajectory_star = futten_pass(trajectory_star)
 
 %%
 % Calculate trajectory length
@@ -69,37 +69,23 @@ phi_earth = 0:1/(length(trajectory_star.r))*360:360;
 r_earth = ones(1,length(trajectory_star.r)+1);
 polar(phi_earth,r_earth,'b')
 legend('Trajectory','Earth')
-pass_speed = trajectory_star_pass.v_pass;
+pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
 %[x y]=euklid(trajectory_star.r,trajectory_star.phi)
 
-var=trajectory_star.phi %trajectory_star.t %
+var=trajectory_star.t %trajectory_star.t %
 
 plot (var, trajectory_star.r)
 hold on
- grad=2;
+ grad=4;
  [C dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
 
- C1=[0.4578
-   -1.4885
-    3.4512];
- plot (var,polyval(C1,var))
+
+ plot (var,polyval(C,var))
 hold on
  plot (var,polyval(dC,var))
 leastsquare_length=arclength(var,C,0,h)
-
-
-
-
-%%får inte detta att bli bra. går inte att få en bra fit med minsta-kvadrat
-%på någon bankurva som inte är R(t). buhu. kan du kika på det?
-%%
-
-
-
-
-
 
 %% Part 3 Find H* for different alphas
 
@@ -116,23 +102,35 @@ for alpha = [70:10:130]
 end
 
 %%
+alpha = 90;
 error_vektor=[];
+no_of_tests = 3;
 
-for a=[h/2, h/4, h/8, h/16];
-trajectory_error=RKevalerror(a,H_star,trajectory_star.t(end));
+% Loop for different step length
+for a=0:no_of_tests
+    h_test = h*2^a;
+    fprintf('h = %f\n', h_test)
+    trajectory_error=RKevalerror(h_test, H_star,2);
 
-end_value=[trajectory_error.r(end),trajectory_error.rdot(end),trajectory_error.phi(end),trajectory_error.phidot(end)];
-error_vektor=[error_vektor;end_value];
+    trajectories_err(a+1) = trajectory_error;
+
+   end_value=[ trajectory_error.r(end),...
+               trajectory_error.rdot(end),...
+               trajectory_error.phi(end),...
+               trajectory_error.phidot(end)];
+   error_vektor=[error_vektor;end_value];
 end
 
 %konvergenskoll
+delta_r = abs(diff(error_vektor(:,:)))
+kvot = []
+for i=0:(length(delta_r(:,1) - 2))
+   kvot(i + 1) = delta_r(end - i,1)/delta_r(end - i - 1,1)
+end
+
 %%
-delta1=error_vektor(1,1)-error_vektor(2,1) %=C*h*1^5
-delta2=error_vektor(2,1)-error_vektor(3,1) %=C*2*h1^5
-konv=delta2./delta1
 
-
-% figure()
+ figure()
 % plot (u_t_star(:,5),u_t_star(:,1))
 % grid on
 % hold on
@@ -143,6 +141,7 @@ konv=delta2./delta1
 % title ('interpolated polynom versus RK values')
 % xlable =('t [h]')
 % ylable =('r [earth radii]');
-
-
+%trajectory_error=RKevalerror(h,H_star,1.671999999);
+%plot (trajectory_error.t,trajectory_error.r)
+%hold on
 

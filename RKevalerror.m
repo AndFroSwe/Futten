@@ -11,10 +11,9 @@ trajectory = struct(    't',        t,...
                         'rdot',     u(2),...
                         'phi',      u(3),...
                         'phidot',   u(4));
+times = 0:h:t_in;
 
-
-% Evaluates while rdot is negative
-while trajectory.t <= t_in                        
+for i = 1:length(times)-1
     [t, u] = RK4step(t, u, h);       % RK step evaluation
     trajectory.t = [trajectory.t; t];
     trajectory.r = [trajectory.r; u(1)];
