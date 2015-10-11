@@ -101,36 +101,41 @@ for alpha = [70:10:130]
     pass_speed_list = [pass_speed_list trajectory_pass_alpha.v_pass]; %corresponding speed of angle 70:10:130
 end
 
-%%
+%% Convergence check for RK4
 alpha = 90;
 error_vektor=[];
-no_of_tests = 5;
+no_of_tests = 3;
 
 % Loop for different step length
-for a=0:no_of_tests
+for a=0:no_of_tests-1
     h_test = h*2^a;
-    fprintf('h = %f\n', h_test)
+    % Run convergence tests
     trajectory_error=RKevalerror(h_test, H_star,2);
-
     trajectories_err(a+1) = trajectory_error;
-
-   end_value=[ trajectory_error.r(end),...
-               trajectory_error.rdot(end),...
-               trajectory_error.phi(end),...
-               trajectory_error.phidot(end)];
-   error_vektor=[error_vektor;end_value];
+    % Save all values
+    end_value=[ trajectory_error.r(end),...
+                trajectory_error.rdot(end),...
+                trajectory_error.phi(end),...
+                trajectory_error.phidot(end)];
+   error_vektor=[error_vektor; end_value];
 end
 
-%konvergenskoll
-delta_r = abs(diff(error_vektor(:,:)))
-kvot = []
-for i=0:(length(delta_r(:,1)) - 2)
-   kvot(i + 1) = delta_r(end - i,1)/delta_r(end - i - 1,1)
-end
+r = getTableData(error_vektor(:, 1));
+rdot = getTableData(error_vektor(:, 2));
+phi = getTableData(error_vektor(:, 3));
+phidot = getTableData(error_vektor(:, 4));
+
+tab = table(r, rdot, phi, phidot)
+rows = {'end(h)' 'end(2h)' 'end(4h)' 'diff(h; 2h)e9' 'diff(2h; 4h)e9' 'kvot' 'rel error'};
+tab.Properties.RowNames = (rows)
+
+
+
+
 
 %%
 
- figure()
+% figure()
 % plot (u_t_star(:,5),u_t_star(:,1))
 % grid on
 % hold on
