@@ -4,7 +4,10 @@ close all; clear all; clc;
 %% Declare variables
 check = 0;   % Enables accuracy control of quadinterpol
 global alpha
-h = 0.001;  % Step length used in RK4
+
+pm = char(177);   % Plus minus sign
+h = 0.01;  % Step length used in RK4
+bisec_err = 0.0001;
 
 %% Part 1: Test H-values and calculate passing r, t and phi for alpha = 90
 % Runge Kuttas method while not crash and while not pass
@@ -51,47 +54,53 @@ start1=3; %first start value for bisection method
 start2=6; %second startvalue for bisection method
 start=[start1 start2];
 
-H_star = bisection_meth(@futt_extra, start, h)
+H_star = bisection_meth(@futt_extra, start, h);
 % Evaluate trajectory for H_star
 trajectory_star = RKeval(h, H_star);
-trajectory_star = futten_pass(trajectory_star)
+trajectory_star = futten_pass(trajectory_star);
+fprintf('Futten passerar precis jordytan vid %0.3f%c%f jordradier\n', H_star, pm, bisec_err)
+fprintf('vilket ger passeringsradie %0.3f%c%f jordradier\n', trajectory_star.r_pass, pm, trajectory_star.r_err)
+fprintf('Passeringshastigheten är då %0.3f%c%f jordradier/h\n', trajectory_star.v_pass, pm, trajectory_star.v_err)
 
 %%
 % Calculate trajectory length
-traj_length=arclength(trajectory_star.t,0,trajectory_star.r,h) %distance traveled
+traj_length=arclength(trajectory_star.t,0,trajectory_star.r,h); %distance traveled
+fprintf('och Futten har åkt avståndet %0.3f%c%f jordradier\n', traj_length, pm, 1)
+
 %%
 figure()
 polar(trajectory_star.phi, trajectory_star.r,'r')
 title('Trajectory at critical H, \alpha =90')
 view([90 -90])
 hold on;
-phi_earth = 0:1/(length(trajectory_star.r))*360:360;
+phi_earth = 0:360/(length(trajectory_star.r)):360;
 r_earth = ones(1,length(trajectory_star.r)+1);
 polar(phi_earth,r_earth,'b')
 legend('Trajectory','Earth')
 pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
-%[x y]=euklid(trajectory_star.r,trajectory_star.phi)
 
-var=trajectory_star.t %trajectory_star.t %
+var=trajectory_star.t; %trajectory_star.t %
 
 plot (var, trajectory_star.r)
 hold on
- grad=4;
- [C dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
+grad=4;
+[C, dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
 
 
- plot (var,polyval(C,var))
+plot (var,polyval(C,var))
 hold on
- plot (var,polyval(dC,var))
-leastsquare_length=arclength(var,C,0,h)
+plot (var,polyval(dC,var))
+leastsquare_length=arclength(var,C,0,h);
+fprintf('Banlängden vid interpolering är %f jordradier\n', leastsquare_length)
 
 %% Part 3 Find H* for different alphas
 
 H_star_alpha = [];
 alpha_list = [];
 pass_speed_list = [];
+figure()
 for alpha = [70:10:130]
     H_alpha = bisection_meth(@futt_extra, start, h);                  %optimal height for different alpha
     H_star_alpha = [H_star_alpha; H_alpha];                     %list of optimal heights
@@ -99,9 +108,11 @@ for alpha = [70:10:130]
     trajectory_star_alpha=RKeval(h,H_alpha);                    %calculates the passing curve
     trajectory_pass_alpha=futten_pass(trajectory_star_alpha);    %calculates the passing paramaters for above curve
     pass_speed_list = [pass_speed_list trajectory_pass_alpha.v_pass]; %corresponding speed of angle 70:10:130
+    
 end
 
 %% Convergence check for RK4
+disp('Check convergence for RK4')
 alpha = 90;
 error_vektor=[];
 no_of_tests = 3;
@@ -125,15 +136,16 @@ rdot = getTableData(error_vektor(:, 2));
 phi = getTableData(error_vektor(:, 3));
 phidot = getTableData(error_vektor(:, 4));
 
-tab = table(r, rdot, phi, phidot)
-rows = {'end(h)' 'end(2h)' 'end(4h)' 'diff(h; 2h)e9' 'diff(2h; 4h)e9' 'kvot' 'rel error'};
-tab.Properties.RowNames = (rows)
+tab = table(r, rdot, phi, phidot);
+rows = {'end(h)' 'end(2h)' 'end(4h)' 'diff(h; 2h)e6' 'diff(2h; 4h)e6' 'kvot' 'rel error'};
+tab.Properties.RowNames = (rows);
+disp(tab)
 
 
 
 
 
-%%
+%% 
 
 % figure()
 % plot (u_t_star(:,5),u_t_star(:,1))

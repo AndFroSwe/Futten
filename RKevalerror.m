@@ -14,7 +14,7 @@ trajectory = struct(    't',        t,...
 times = 0:h:t_in;
 
 for i = 1:length(times)-1
-    [t, u] = RK4step(t, u, h);       % RK step evaluation
+    [t, u] = RK4step(times(i), u, h);       % RK step evaluation
     trajectory.t = [trajectory.t; t];
     trajectory.r = [trajectory.r; u(1)];
     trajectory.rdot = [trajectory.rdot; u(2)];
