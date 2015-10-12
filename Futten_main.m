@@ -13,19 +13,19 @@ bisec_err = 0.0001;
 % Runge Kuttas method while not crash and while not pass
 disp('Part 1')
 alpha = 90;
-t_list = [];         % Empty vector of passing t:s
-r_list = [];         % Empty vector of passing r:s
-phi_list = [];       % Empty vector of passing phi:s
-H_list = [];         % Empty vector of passing phi:s
-crash_list = [];     % Empty vector of passing phi:s
+t_list = [];                        % Empty vector of passing t:s
+r_list = [];                        % Empty vector of passing r:s
+phi_list = [];                      % Empty vector of passing phi:s
+H_list = [];                        % Empty vector of passing phi:s
+crash_list = [];                    % Empty vector of passing phi:s
 starting_heights = [10, 8, 6, 2];
 
 % Test and plot trajectories for different H
 figure ()
-plotStyle = {'b','g','r','m'};          % Set colors of trajectory plots
+plotStyle = {'b','g','r','m'};                       % Set colors of trajectory plots
 for i = 1:length(starting_heights)                   % Test H:s
     H = starting_heights(i);
-    trajectory = RKeval(h, H);     % Evaluate trajecory with RK4
+    trajectory = RKeval(h, H);                       % Evaluate trajecory with RK4
     trajectory.H=H;
     trajectories(i) = trajectory;
     % Plot trajectory
@@ -35,7 +35,7 @@ for i = 1:length(starting_heights)                   % Test H:s
     legendInfo{i} = ['Starting height ' num2str(H) ' earth radii'];       % Add legend info for use in legend command   
 end
 title ('Trajectories for different starting altitudes, \alpha =90')
-legend(legendInfo)                      % Set legends accoring to legend info
+legend(legendInfo)     % Set legends accoring to legend info
 
 %find passing values for all trajectories   
 for i = 1:length(starting_heights)
@@ -50,8 +50,8 @@ make_table(trajectories)
 %% Part 2 Find H*, H when Futten just passes earth
 % Bisection method to determine critical starting height, H_star, when 
 % trajectory just passes earth.
-start1=3; %first start value for bisection method
-start2=6; %second startvalue for bisection method
+start1=3;       %first start value for bisection method
+start2=6;       %second startvalue for bisection method
 start=[start1 start2];
 
 H_star = bisection_meth(@futt_extra, start, h);
@@ -81,19 +81,19 @@ pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
 
-var=trajectory_star.t; 
-
+var=trajectory_star.phi; 
 plot (var, trajectory_star.r)
 hold on
 grad=2;
 [C, dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
-
-
+legendtext = sprintf('Interpolerad med polynom %0.2f%c^2%0.2f%c+%0.2f=r', C(1), 966, C(2), 966, C(3));
+title('Kurva från RK4 mot interpolad till grad 2')
+leg = {'RK4' legendtext};
+% Plot interpolated
 plot (var,polyval(C,var))
-hold on
-plot (var,polyval(dC,var))
+legend(leg)
 %(analytiskt beräknad banlängd till 3.2018 från minsta kvadrat)
-fprintf('Banlängden vid interpolering är %f jordradier\n', 3.2018)
+fprintf('Banlängden vid interpolering är %f jordradier\r\n', 3.2018)
 
 %% Part 3 Find H* for different alphas
 
@@ -101,15 +101,44 @@ H_star_alpha = [];
 alpha_list = [];
 pass_speed_list = [];
 figure()
-for alpha = [70:10:130]
-    H_alpha = bisection_meth(@futt_extra, start, h);                  %optimal height for different alpha
-    H_star_alpha = [H_star_alpha; H_alpha];                     %list of optimal heights
-    alpha_list = [alpha_list alpha];                            %alpha list
-    trajectory_star_alpha=RKeval(h,H_alpha);                    %calculates the passing curve
-    trajectory_pass_alpha=futten_pass(trajectory_star_alpha);    %calculates the passing paramaters for above curve
-    pass_speed_list = [pass_speed_list trajectory_pass_alpha.v_pass]; %corresponding speed of angle 70:10:130
-    
+% Loop over alphas and plot trajectory
+i = 1;
+alpha_legend = {};
+alpha_pass = [];
+alphas = [150:-10:50];
+for alpha = alphas
+    H_alpha = bisection_meth(@futt_extra, start, h);                    %optimal height for different alpha
+    H_star_alpha = [H_star_alpha; H_alpha];                             %list of optimal heights
+    alpha_list = [alpha_list alpha];                                    %alpha list
+    trajectory_star_alpha=RKeval(h,H_alpha);                            %calculates the passing curve
+    trajectory_pass_alpha=futten_pass(trajectory_star_alpha);           %calculates the passing paramaters for above curve
+    pass_speed_list = [pass_speed_list trajectory_pass_alpha.v_pass];   %corresponding speed of angle 70:10:130
+    polar(trajectory_pass_alpha.phi, trajectory_pass_alpha.r)
+    view([90 -90])                      % Flip plot to 0 deg up
+    hold on
+    legend_text = sprintf('%c=%d', 945, alpha);
+    v_err(i) = trajectory_pass_alpha.v_err;
+    H_err(i) = trajectory_pass_alpha.r_err;
+    alpha_legend{i} = legend_text;
+    pass_speed(i) = trajectory_pass_alpha.v_pass;
+    i = i + 1;
 end
+
+% Flip to fit table
+alphas = alphas';
+pass_speed = pass_speed';
+v_err = v_err';
+H_err = H_err';
+
+% Calculate errors
+
+title('Trajectories at different starting angles')
+legend(alpha_legend)
+
+alpha_table = table(alphas, H_star_alpha, H_err, pass_speed, v_err);
+disp('Passing parameters for different alphas')
+disp(alpha_table)
+writetable(alpha_table, 'alphas.xls')
 
 %% Convergence check for RK4
 disp('Check convergence for RK4')
@@ -137,28 +166,8 @@ phi = getTableData(error_vektor(:, 3));
 phidot = getTableData(error_vektor(:, 4));
 
 tab = table(r, rdot, phi, phidot);
+writetable(tab, 'RKerrors.xls');
 rows = {'end(h)' 'end(2h)' 'end(4h)' 'diff(h; 2h)e6' 'diff(2h; 4h)e6' 'kvot' 'rel error'};
 tab.Properties.RowNames = (rows);
 disp(tab)
-
-
-
-
-
-%% 
-
-% figure()
-% plot (u_t_star(:,5),u_t_star(:,1))
-% grid on
-% hold on
-% x_range=[0:0.0001:u_t_star(end,5)];
-% y_range=polyval (c,x_range);
-% plot (x_range,y_range,'r');
-% legend('Values from RK','Values from polynom')
-% title ('interpolated polynom versus RK values')
-% xlable =('t [h]')
-% ylable =('r [earth radii]');
-%trajectory_error=RKevalerror(h,H_star,1.671999999);
-%plot (trajectory_error.t,trajectory_error.r)
-%hold on
 

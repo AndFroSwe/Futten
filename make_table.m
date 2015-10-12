@@ -20,3 +20,4 @@ end
 T = table(H, t_pass, t_err, r_pass, r_err, phi_pass, phi_err);
 disp('Passing values for Fnutten')
 disp(T)
+writetable(T, 'pass.xls')
