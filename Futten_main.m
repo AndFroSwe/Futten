@@ -63,8 +63,8 @@ fprintf('vilket ger passeringsradie %0.3f%c%f jordradier\n', trajectory_star.r_p
 fprintf('Passeringshastigheten är då %0.3f%c%f jordradier/h\n', trajectory_star.v_pass, pm, trajectory_star.v_err)
 %%
 % Calculate trajectory length
-traj_length = arclength(trajectory_star.phi, 0, trajectory_star.r); %distance traveled
-traj_length_2h = arclength((trajectory_star.phi(1:2:end)), 0, trajectory_star.r(1:2:end));
+traj_length = arclength(trajectory_star.t, 0, trajectory_star.r); %distance traveled
+traj_length_2h = arclength((trajectory_star.t(1:2:end)), 0, trajectory_star.r(1:2:end));
 fprintf('och Futten har åkt avståndet %0.3f%c%f jordradier\n', traj_length, pm, abs(traj_length - traj_length_2h))
 
 %% Plot trajectory at H_star
@@ -81,7 +81,7 @@ pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
 
-var=trajectory_star.t; %trajectory_star.t %
+var=trajectory_star.t; 
 
 plot (var, trajectory_star.r)
 hold on
@@ -92,8 +92,8 @@ grad=2;
 plot (var,polyval(C,var))
 hold on
 plot (var,polyval(dC,var))
-
-fprintf('Banlängden vid interpolering är %f jordradier\n', 1)
+%(analytiskt beräknad banlängd till 3.2018 från minsta kvadrat)
+fprintf('Banlängden vid interpolering är %f jordradier\n', 3.2018)
 
 %% Part 3 Find H* for different alphas
 
