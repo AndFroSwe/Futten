@@ -81,12 +81,12 @@ pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
 
-var=trajectory_star.t; %trajectory_star.t %
+var=trajectory_star.phi; %trajectory_star.t %
 
 plot (var, trajectory_star.r)
 hold on
 grad=2;
-[C, dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
+[C, dC] = least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
 
 
 plot (var,polyval(C,var))

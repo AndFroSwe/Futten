@@ -2,7 +2,7 @@ function [trajectory] = futten_pass(trajectory)
 % FUTTEN_PASS (trajectory) calculates the different passing parameters
 %r,phi,t,v using linear interpolation and hermit for when rdot equals zero
 %i.e spaceship is heading to space again. 
-RK_r_err = 1.0019e-0;
+RK_r_err = 1.0019e-6;
 RK_phi_err = 9.061e-07;
 RK_phidot_err = 8.2023e-07;
 herm_relerr = 600e-6;
