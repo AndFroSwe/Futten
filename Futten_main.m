@@ -45,7 +45,7 @@ trajectories=trajectories_temp;
 
 
 % Display results part 1
-make_table(trajectories)
+make_table(trajectories, 'pass.xls')
 
 %% Part 2 Find H*, H when Futten just passes earth
 % Bisection method to determine critical starting height, H_star, when 
@@ -63,8 +63,9 @@ fprintf('vilket ger passeringsradie %0.3f%c%f jordradier\n', trajectory_star.r_p
 fprintf('Passeringshastigheten är då %0.3f%c%f jordradier/h\n', trajectory_star.v_pass, pm, trajectory_star.v_err)
 %%
 % Calculate trajectory length
-traj_length = arclength(trajectory_star.t, 0, trajectory_star.r); %distance traveled
-traj_length_2h = arclength((trajectory_star.t(1:2:end)), 0, trajectory_star.r(1:2:end));
+[X.star,Y.star]=euklid(trajectory_star.r,trajectory_star.phi); %turns polar to kartesis kordi.
+traj_length = arclength(X.star, 0, Y.star); %distance traveled
+traj_length_2h = arclength((X.star(1:2:end)), 0, Y.star(1:2:end));
 fprintf('och Futten har åkt avståndet %0.3f%c%f jordradier\n', traj_length, pm, abs(traj_length - traj_length_2h))
 
 %% Plot trajectory at H_star
@@ -80,20 +81,22 @@ legend('Trajectory','Earth')
 pass_speed = trajectory_star.v_pass;
 %% least square and length
 figure()
-
-var=trajectory_star.phi; 
-plot (var, trajectory_star.r)
+ 
+plot (X.star, Y.star)
 hold on
 grad=2;
-[C, dC]=least_square(var,trajectory_star.r,grad); %C=poly coeffs, dC=derivate
+[C]=least_square(X.star,Y.star,grad); %C=poly coeffs, dC=derivate
 legendtext = sprintf('Interpolerad med polynom %0.2f%c^2%0.2f%c+%0.2f=r', C(1), 966, C(2), 966, C(3));
 title('Kurva från RK4 mot interpolad till grad 2')
 leg = {'RK4' legendtext};
 % Plot interpolated
-plot (var,polyval(C,var))
+plot (X.star,polyval(C,X.star))
 legend(leg)
-%(analytiskt beräknad banlängd till 3.2018 från minsta kvadrat)
-fprintf('Banlängden vid interpolering är %f jordradier\r\n', 3.2018)
+title('Interporad kurva för Futten mot kurva frpn RK4')
+xlabel('x [jordradier]')
+ylabel('y [jordradier]')
+%(analytiskt beräknad banlängd till 4.00492 från minsta kvadrat)
+fprintf('Banlängden vid interpolering är %f jordradier\r\n', 4.00492)
 
 %% Part 3 Find H* for different alphas
 
@@ -170,4 +173,8 @@ writetable(tab, 'RKerrors.xls');
 rows = {'end(h)' 'end(2h)' 'end(4h)' 'diff(h; 2h)e6' 'diff(2h; 4h)e6' 'kvot' 'rel error'};
 tab.Properties.RowNames = (rows);
 disp(tab)
+
+% Error of Hermite
+Hermitefel(H_star);
+
 

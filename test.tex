@@ -1,0 +1,122 @@
+
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[swedish]{babel}
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\usepackage{amsmath}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+
+\begin{document}
+
+
+\lstset{language=Matlab,%
+    %basicstyle=\color{red},
+    breaklines=true,%
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},%
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},%
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},%
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    numbers=left,%
+    numberstyle={\tiny \color{black}},% size of the numbers
+    numbersep=9pt, % this defines how far the numbers are from the text
+    emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+    %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+} 
+\section*{Bilaga i: Huvudprogram}
+Denna bilaga innehåller huvudkoden som använts i uppgiften. 
+\lstinputlisting{Futten_main.m} 
+\newpage
+
+\section*{Bilaga ii: Runge-Kutta 4}
+Denna bilaga innehåller koden till Runge-Kutta 4 som använts, samt dess
+hjälpfunktioner. \newline
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+RKeval itererar RK4 tills jorden passerats, alltså när $\dot{r}=0$.
+\lstinputlisting{RKeval.m} 
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+RKstep utför ett steg av RK4.
+\lstinputlisting{RK4step.m} 
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+F innehåller differentialekvationerna.
+\lstinputlisting{F.m} 
+\newpage
+
+\section*{Bilaga iii: Passering}
+Denna bilaga innehåller funktionen som använts för att beräkna Futtens
+passeringsvärden, samt Hermite- och linjär interpolering.\newline
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+futten\_pass beräknar värdena för futtens passering.
+\lstinputlisting{futten_pass.m} 
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+linpol är en funktion för linjärinterpolering.
+\lstinputlisting{linpol.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+herm är en funtion för Hermite-interpolering.
+\lstinputlisting{herm.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+bisection\_meth innehåller sekantmetoden.
+\lstinputlisting{bisection_meth.m}
+\newpage
+
+\section*{Bilaga iv: Övriga funktioner}
+Denna bilaga innehåller funktioner som inte lika lätt kan presenteras i
+sammanhang av uppgiftslösningen. \newline
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+least\_square är en  funtion för minstakvadratanpassning.
+\lstinputlisting{least_square.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+cartesian gör om polära koordinater till kartesiska.
+\lstinputlisting{cartesian.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+arclength beräknar banlängden för en kurva med givna punkter i kartesiska
+koordinater.
+\lstinputlisting{arclength.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+Hermitefel räknar ut felskattningen för Hermiteinterpolering.
+\lstinputlisting{Hermitefel.m}
+\noindent\makebox[\linewidth]{\rule{\paperwidth}{0.4pt}}
+herm\_step Hermiteinterpolerar mellan två punkter och returnerar interpolerade
+värden mellan kurvorna (används for att plotta hel interpolerad kurva).
+\lstinputlisting{herm_step.m}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

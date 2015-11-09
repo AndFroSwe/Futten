@@ -1,6 +1,6 @@
-function [] = make_table (trajectories)
+function [] = make_table (trajectories, excel_name)
 % MAKE_TABLE (trajectory) prints the passing values of the trajectory
-
+% and adds them to excel file.
 no_of_rows = 4;
 
 % Loop adds all relevant values into struct

@@ -2,9 +2,10 @@
 % 2 values
 function [err] = linpol_err(v)
 
+% Define points
+next_next_last = v(end -2);
 next_last = v(end-1);
 last = v(end);
 
-mid = mean([next_last last]);
-err = abs(last - mid);
+
 

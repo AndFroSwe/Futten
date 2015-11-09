@@ -1,46 +1,47 @@
 function [] = Hermitefel(H)
-% HERMITFEL plots error estimations from Hermite interpolation
+% HERMITFEL 
 
 % Define parameters
 h = 0.01;
 u = [H 0 0 0];
-bana_big = RKeval(h*2, H);
+%bana_big = RKeval(h*2, H);
 bana_small = RKeval(h, H);
+bana_big = struct(  't',    bana_small.t(1:2:end),...
+                    'r',    bana_small.r(1:2:end),...
+                    'rdot', bana_small.rdot(1:2:end),...
+                    'phi',  bana_small.phi(1:2:end),...
+                    'phidot',   bana_small.phidot(1:2:end));
 
 x1 = [];
 y1 = [];
 x2 = [];
 y2 = [];
+phi1=[];
+phi2=[];
 
+k = 2;
 % Get interpolation for 2*h
 for n = 1:length(bana_big.t) - 1 
-    [x, y] = herm_step(bana_big, n);
+    [x, y, phi] = herm_step(bana_big, n, k);
     x1 = [x1 x];
     y1 = [y1 y];
+    phi1=[phi1 phi];
     hold on
 end
 
+k = 1;
 % Get interpolation for h
 for n = 1:length(bana_small.t) - 1 
-    [x, y] = herm_step(bana_small, n);
+    [x, y, phi] = herm_step(bana_small, n, k);
     x2 = [x2 x];
     y2 = [y2 y];
+    phi2=[phi2 phi];
     hold on
 end
 
-figure()
-% Plot full 
-plot(x1,y1)
-hold on
-plot(x2,y2)
-grid on
-leg_big = sprintf('h=%0.3f', 2*h);
-leg_small = sprintf('h=%0.3f', h);
-title('Bana stycvis interpolerad med Hermite-interpolering')
-legend({leg_big, leg_small})
-xlabel('x [m]')
-ylabel('y [m]')
-hold off
+err_abs = max(abs(y1 - y2));
+ind = find(max(abs(y1 - y2)) == err_abs);
+err_rel = err_abs/y1(ind);
 
-% Assess error from plot
-fprintf('Relativt fel bedöms ur från avstånd mellan linjer: %f*10^-6\n', (abs(y1(end-1)-y2(end-1)))/y2(end-1)*1e6)
+
+fprintf('Hermitefel %fe-6\n', err_rel*1e6)

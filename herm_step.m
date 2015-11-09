@@ -1,8 +1,9 @@
-function [xpos, v] = herm_step(bana, n)
+function [xpos, v, phi] = herm_step(bana, n, k)
 
-points = 100;
+points = 100*k;
 xpos = [];
 v = [];
+phi=[];
 x1 = bana.t(n);
 x2 = bana.t(n + 1);
 
@@ -13,8 +14,13 @@ for i = 1:points
                     [x1, x2],...
                     [bana.r(n), bana.r(n + 1)],...
                     [bana.rdot(n), bana.rdot(n + 1)]);
-%    p = LinPol(bana.y(n), bana.y(n + 1), x1, x2, x);
+    p2= herm(    x,...
+                    [x1, x2],...
+                    [bana.phi(n), bana.phi(n + 1)],...
+                    [bana.phidot(n), bana.phidot(n + 1)]);         
+
     v = [v p];
+    phi=[phi,p2];
     xpos = [xpos x];
 end
 
